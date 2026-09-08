@@ -1,0 +1,405 @@
+---
+import '../styles/global.css';
+import { attraction, imageSources, faq } from '../data/site';
+
+export const prerender = true;
+
+const siteOrigin = Astro.site;
+const canonicalUrl = siteOrigin ? new URL(Astro.url.pathname, siteOrigin).toString() : undefined;
+const title = 'Ала-Тоо аянты — Бишкектин башкы аянты | Баруу боюнча колдонмо';
+const description = attraction.description;
+
+const attractionSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'TouristAttraction',
+  name: attraction.name,
+  alternateName: attraction.alternateName,
+  ...(canonicalUrl ? { url: canonicalUrl } : {}),
+  description,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: attraction.address.streetAddress,
+    addressLocality: attraction.address.addressLocality,
+    addressCountry: attraction.address.addressCountry,
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: attraction.geo.latitude,
+    longitude: attraction.geo.longitude,
+  },
+  isAccessibleForFree: true,
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: [
+      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'
+    ],
+    opens: '00:00',
+    closes: '23:59',
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: attraction.rating.value,
+    reviewCount: attraction.rating.count,
+  },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+};
+
+const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579214913649!2d74.60103957751176!3d42.87533647114969!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x389eb7dcbdacf87b%3A0xfc7d686ab988f348!2sAla-Too%20Square!5e1!3m2!1sky!2skg!4v1788736424702!5m2!1sky!2skg&hl=ky&gl=kg';
+---
+<!doctype html>
+<html lang="ky">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#8e211f" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <title>{title}</title>
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ky_KG" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(attractionSchema)}></script>
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXM22WWPKP"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HXM22WWPKP');
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2">Негизги мазмунга өтүү</a>
+
+    <header class="absolute inset-x-0 top-0 z-30 px-5 py-5 text-white md:px-10">
+      <div class="mx-auto flex max-w-[1500px] items-center justify-between border-b border-white/30 pb-4">
+        <a href="#top" class="flex items-center gap-3 font-bold" aria-label="Ала-Тоо аянты — башкы бет">
+          <img src="/icons/favicon.svg" width="42" height="42" alt="" class="rounded-xl" />
+          <span class="text-sm tracking-[.16em] uppercase">Ала-Тоо · Бишкек</span>
+        </a>
+        <nav aria-label="Негизги навигация" class="hidden gap-6 text-sm font-semibold md:flex">
+          <a href="#history" class="hover:opacity-70">Тарых</a>
+          <a href="#route" class="hover:opacity-70">Маршрут</a>
+          <a href="#visit" class="hover:opacity-70">Баруу</a>
+          <a href="#map" class="hover:opacity-70">Карта</a>
+          <a href="#faq" class="hover:opacity-70">FAQ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="top" class="hero-mask relative min-h-[92vh] overflow-hidden bg-[#332820] text-white">
+        <img
+          src={imageSources[0].src}
+          alt={imageSources[0].alt}
+          width="1280"
+          height="960"
+          fetchpriority="high"
+          class="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        <div class="relative z-10 mx-auto flex min-h-[92vh] max-w-[1500px] items-end px-5 pb-12 pt-36 md:px-10 md:pb-16">
+          <div class="grid w-full gap-8 lg:grid-cols-[1fr_350px] lg:items-end">
+            <div>
+              <div class="mb-5 flex items-center gap-3">
+                <span class="h-px w-12 bg-[#e6b95f]"></span>
+                <span class="eyebrow text-[#f4d89c]">Бишкектин борбордук аянты</span>
+              </div>
+              <h1 class="display max-w-5xl text-[clamp(4rem,12vw,10rem)] font-bold">Ала-Тоо</h1>
+              <p class="mt-5 max-w-3xl text-lg text-white/85 md:text-2xl">
+                Манас эстелиги, тарых музейи, фонтандар жана шаардын чоң салтанаттары бириккен Бишкектин жандуу жүрөгү.
+              </p>
+            </div>
+            <aside class="border-l border-white/30 pl-6 text-sm text-white/85">
+              <div class="mb-6 text-5xl font-light text-[#f4d89c]">42.8753°N</div>
+              <dl class="grid grid-cols-2 gap-y-3">
+                <dt>Кирүү</dt><dd class="text-right font-bold text-white">Акысыз</dd>
+                <dt>Жеткиликтүүлүк</dt><dd class="text-right font-bold text-white">24 саат</dd>
+                <dt>Баалоо</dt><dd class="text-right font-bold text-white">4.5 / 5</dd>
+                <dt>Дарек</dt><dd class="text-right font-bold text-white">Раззаков 51</dd>
+              </dl>
+            </aside>
+          </div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 z-20 knot-line text-[#e6b95f]"></div>
+      </section>
+
+      <section class="grid-paper px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
+            <div>
+              <p class="eyebrow text-[var(--red)]">Эмне үчүн баруу керек?</p>
+              <h2 class="display mt-5 text-5xl font-bold md:text-7xl">Бир аянтта — шаардын мүнөзү</h2>
+            </div>
+            <div class="grid gap-6 md:grid-cols-2">
+              <p class="text-xl leading-relaxed md:text-2xl">
+                Ала-Тоо аянты — жөн гана кең мейкиндик эмес. Бул жерде Кыргызстандын мамлекеттик символдору, советтик доордун масштабдуу архитектурасы жана бүгүнкү Бишкектин коомдук турмушу катмарланып көрүнөт.
+              </p>
+              <p class="text-base leading-relaxed text-black/65 md:text-lg">
+                Кең борбордук огу, Манастын монументалдык айкели, Мамлекеттик тарых музейинин ак таш фасады, желек мамысы жана фонтандар аянтты шаарды түшүнүү үчүн эң ыңгайлуу баштапкы чекит кылат.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="history" class="section-rule px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <p class="eyebrow text-[var(--red)]">Тарых жана маани</p>
+              <h2 class="display mt-4 text-5xl font-bold md:text-7xl">1984-жылдан бүгүнкүгө</h2>
+            </div>
+            <p class="max-w-xl text-black/60">Аянттын эстеликтери алмашкан сайын өлкөнүн саясий жана маданий символикасы да өзгөрүп келген.</p>
+          </div>
+          <div class="grid border-y border-black/15 md:grid-cols-3">
+            <article class="p-7 md:border-r md:border-black/15 md:p-10">
+              <div class="text-5xl font-light text-[var(--red)]">1984</div>
+              <h3 class="mt-5 text-xl font-bold">Борбордук аянттын ачылышы</h3>
+              <p class="mt-3 text-black/65">Аянт Кыргыз ССРинин 60 жылдыгына карата түзүлүп, борбордук мамлекеттик салтанаттар үчүн жаңы мейкиндик болуп калган. Алгач бул жерде Лениндин эстелиги турган.</p>
+            </article>
+            <article class="border-t border-black/15 p-7 md:border-r md:border-t-0 md:p-10">
+              <div class="text-5xl font-light text-[var(--red)]">2003</div>
+              <h3 class="mt-5 text-xl font-bold">Эркиндик символу</h3>
+              <p class="mt-3 text-black/65">Лениндин эстелиги башка жерге көчүрүлгөндөн кийин анын ордуна «Эркиндик» композициясы коюлуп, аянттын символдук тили жаңы доорго өткөн.</p>
+            </article>
+            <article class="border-t border-black/15 p-7 md:border-t-0 md:p-10">
+              <div class="text-5xl font-light text-[var(--red)]">2011</div>
+              <h3 class="mt-5 text-xl font-bold">Манас — негизги акцент</h3>
+              <p class="mt-3 text-black/65">Эгемендүүлүктүн 20 жылдыгына карата Манастын эстелиги орнотулуп, бүгүнкү композициянын эң таанымал вертикалдык белгисине айланган.</p>
+            </article>
+          </div>
+          <div class="mt-10 grid gap-8 rounded-[2rem] bg-[#201b17] p-8 text-white md:grid-cols-[1fr_1.1fr] md:p-12">
+            <div>
+              <p class="eyebrow text-[#e6b95f]">Архитектуралык мүнөз</p>
+              <h3 class="display mt-4 text-4xl font-bold md:text-5xl">Монументалдуу, бирок ачык</h3>
+            </div>
+            <p class="text-lg text-white/75">Советтик модернизмге мүнөздүү кең масштаб жана симметрия бүгүнкү коомдук ландшафт менен айкалышкан. Тарых музейинин геометриялык көлөмү, таш каптамалар, бийик желек мамысы жана суу элементтери чоң бош мейкиндикти адамга жакын деңгээлде бөлүп берет.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="route" class="red-panel px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="grid gap-10 lg:grid-cols-[.8fr_1.2fr]">
+            <div class="lg:sticky lg:top-10 lg:self-start">
+              <p class="eyebrow text-[#e6b95f]">Жөө маршрут</p>
+              <h2 class="display mt-5 text-5xl font-bold md:text-7xl">Аянтты 60–90 мүнөттө окуңуз</h2>
+              <p class="mt-6 max-w-md text-white/70">Маршрут чоң тегерек жасабайт: негизги символдор бир борбордук огуна топтолгон. Музейге кирсеңиз, дагы 1–2 саат кошуңуз.</p>
+            </div>
+            <ol class="space-y-5">
+              <li class="grid grid-cols-[74px_1fr] gap-5 border-t border-white/25 pt-6">
+                <span class="display text-5xl text-[#e6b95f]">01</span>
+                <div><h3 class="text-2xl font-bold">Манас эстелигинен баштаңыз</h3><p class="mt-2 text-white/70">Эстеликти алдыңкы планда кармап, аянттын борбордук масштабын жана музей менен болгон визуалдык огун байкаңыз.</p></div>
+              </li>
+              <li class="grid grid-cols-[74px_1fr] gap-5 border-t border-white/25 pt-6">
+                <span class="display text-5xl text-[#e6b95f]">02</span>
+                <div><h3 class="text-2xl font-bold">Музей фасады жана фонтандар</h3><p class="mt-2 text-white/70">Ак таш фасаддын түз сызыктарын фонтандардын кыймылдуу суусу менен салыштырыңыз. Жайында бул бөлүк аянттын эң жандуу зонасына айланат.</p></div>
+              </li>
+              <li class="grid grid-cols-[74px_1fr] gap-5 border-t border-white/25 pt-6">
+                <span class="display text-5xl text-[#e6b95f]">03</span>
+                <div><h3 class="text-2xl font-bold">Желек жана ачык панорама</h3><p class="mt-2 text-white/70">Бийик желек мамысы аянттын вертикалдык борбору. Ачык мейкиндиктен Чүй проспектиси тараптагы шаардык ритм да жакшы окулат.</p></div>
+              </li>
+              <li class="grid grid-cols-[74px_1fr] gap-5 border-t border-white/25 pt-6">
+                <span class="display text-5xl text-[#e6b95f]">04</span>
+                <div><h3 class="text-2xl font-bold">Эркиндик бульварына улантыңыз</h3><p class="mt-2 text-white/70">Аянттан кийин дарактуу Эркиндик бульварына же Эмен багына өтсөңүз, Бишкектин борбордук бөлүгүнүн башка масштабын сезесиз.</p></div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="mb-10 flex items-end justify-between gap-6">
+            <div><p class="eyebrow text-[var(--red)]">Сүрөткө тартуу</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Кеңдикти кадрга сыйдыруу</h2></div>
+          </div>
+          <div class="grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
+            <figure class="relative min-h-[520px] overflow-hidden rounded-[2rem] bg-black">
+              <img src={imageSources[1].src} alt={imageSources[1].alt} loading="lazy" width="1280" height="960" class="absolute inset-0 h-full w-full object-cover" />
+              <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-7 pt-20 text-sm text-white">Борбордук кең көрүнүш · {imageSources[1].credit}</figcaption>
+            </figure>
+            <div class="grid gap-5">
+              <figure class="relative min-h-[300px] overflow-hidden rounded-[2rem] bg-black">
+                <img src={imageSources[2].src} alt={imageSources[2].alt} loading="lazy" width="1280" height="943" class="absolute inset-0 h-full w-full object-cover" />
+                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-16 text-sm text-white">Тарых музейинин фасады · {imageSources[2].credit}</figcaption>
+              </figure>
+              <div class="card-stone rounded-[2rem] p-7">
+                <h3 class="text-xl font-bold">Эң жакшы 3 кадр</h3>
+                <ul class="mt-4 space-y-3 text-black/65">
+                  <li>— Фонтанды алдыңкы планга коюп, Манас жана музейди бир огунда алуу.</li>
+                  <li>— Желекти ачык асман менен минималисттик композицияда тартуу.</li>
+                  <li>— Кечки көк саатта суу бетиндеги жана таштагы жарык чагылыштарын колдонуу.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <p class="mt-5 text-sm text-black/55">Кең бурчтуу объектив пайдалуу. Мамлекеттик иш-чараларда тосмолор жана коопсуздук зоналары болушу мүмкүн — кызматкерлердин көрсөтмөсүн сактаңыз.</p>
+        </div>
+      </section>
+
+      <section id="visit" class="section-rule grid-paper px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="mb-12"><p class="eyebrow text-[var(--red)]">Практикалык маалымат</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Барууну пландаңыз</h2></div>
+          <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+            <article class="card-stone rounded-3xl p-7"><div class="text-sm font-bold text-[var(--red)]">01 · Убакыт</div><h3 class="mt-4 text-2xl font-bold">24 саат ачык</h3><p class="mt-3 text-black/60">Ачык коомдук аянт. Ири иш-чараларда айрым секторлор убактылуу чектелиши мүмкүн.</p></article>
+            <article class="card-stone rounded-3xl p-7"><div class="text-sm font-bold text-[var(--red)]">02 · Баа</div><h3 class="mt-4 text-2xl font-bold">Кирүү акысыз</h3><p class="mt-3 text-black/60">Аянт үчүн билет жок. Музей жана атайын иш-чаралар өзүнчө бааланат.</p></article>
+            <article class="card-stone rounded-3xl p-7"><div class="text-sm font-bold text-[var(--red)]">03 · Эң жакшы мезгил</div><h3 class="mt-4 text-2xl font-bold">Эртең менен же кечинде</h3><p class="mt-3 text-black/60">Жайкы түштө күн катуу болушу мүмкүн. Таң жана күн батар алдындагы жарык жайлуу жана фотогеникалык.</p></article>
+            <article class="card-stone rounded-3xl p-7"><div class="text-sm font-bold text-[var(--red)]">04 · Узактык</div><h3 class="mt-4 text-2xl font-bold">45–90 мүнөт</h3><p class="mt-3 text-black/60">Музей, Эмен багы жана бульвар кошулса, борборго 2–4 саат бөлгөн жакшы.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto grid max-w-[1360px] gap-12 lg:grid-cols-2">
+          <div>
+            <p class="eyebrow text-[var(--red)]">Толук транспорт</p>
+            <h2 class="display mt-4 text-5xl font-bold">Кантип жетүүгө болот?</h2>
+            <div class="mt-8 space-y-6">
+              <div class="border-l-2 border-[var(--red)] pl-5"><h3 class="font-bold">Жөө</h3><p class="mt-1 text-black/60">Бишкектин борборунда болсоңуз, аянт Чүй проспектиси, Эркиндик бульвары жана Эмен багы менен жөө маршрутка оңой кошулат.</p></div>
+              <div class="border-l-2 border-[var(--red)] pl-5"><h3 class="font-bold">Коомдук транспорт</h3><p class="mt-1 text-black/60">Борборду кесип өткөн автобус жана маршруттук каттамдар Чүй проспектисине жакын токтойт. Каттамдар өзгөрүп турушу мүмкүн, ошондуктан ошол күнкү шаардык транспорт картасынан «Ала-Тоо аянты» багытын текшериңиз.</p></div>
+              <div class="border-l-2 border-[var(--red)] pl-5"><h3 class="font-bold">Такси</h3><p class="mt-1 text-black/60">Айдоочуга «Ала-Тоо аянты, Раззаков 51» деп көрсөтүү жетиштүү. Иш-чара маалында жакын көчөлөр жабылышы мүмкүн; акыркы бөлүгүн жөө басууга даяр болуңуз.</p></div>
+            </div>
+          </div>
+          <div class="rounded-[2rem] bg-[#dfd6c8] p-8 md:p-10">
+            <p class="eyebrow text-[var(--red)]">Токтотмо</p>
+            <h2 class="display mt-4 text-4xl font-bold">Унаа менен келсеңиз</h2>
+            <p class="mt-6 text-lg">Аянттын өзүндө туристтерге арналган чоң өзүнчө автотоктотмо жок. Борбордогу белгиленген көчө токтотмолорун же жакынкы коммерциялык имараттардын токтотмолорун колдонуңуз.</p>
+            <div class="mt-7 border-t border-black/15 pt-6 text-sm text-black/60">
+              <strong class="text-black">Маанилүү:</strong> мамлекеттик майрам, концерт жана расмий иш-чара күндөрү унаа кыймылы жана токтотмо режими убактылуу өзгөрүшү мүмкүн.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="map" class="bg-[#1d1916] px-5 py-20 text-white md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="mb-8 grid gap-6 md:grid-cols-2 md:items-end">
+            <div><p class="eyebrow text-[#e6b95f]">Карта</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Бишкектин так борборунда</h2></div>
+            <address class="not-italic text-white/65 md:text-right">Раззаков көчөсү 51, Бишкек, Кыргызстан<br />VJG3+7F</address>
+          </div>
+          <div class="map-frame overflow-hidden rounded-[2rem] border border-white/15 bg-white/5">
+            <iframe
+              src={mapEmbed}
+              width="100%"
+              height="560"
+              style="border:0;"
+              allowfullscreen
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              title="Ала-Тоо аянтынын Google картасы"
+            ></iframe>
+          </div>
+          <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#e6b95f]">Google Карталарда ачуу ↗</a>
+        </div>
+      </section>
+
+      <section class="px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="grid gap-12 lg:grid-cols-3">
+            <div>
+              <p class="eyebrow text-[var(--red)]">Жакынкы жерлер</p>
+              <h2 class="display mt-4 text-5xl font-bold">Бир күндүк борбордук кластер</h2>
+            </div>
+            <div class="lg:col-span-2 grid gap-4 md:grid-cols-2">
+              <article class="card-stone rounded-3xl p-7"><h3 class="text-xl font-bold">Мамлекеттик тарых музейи</h3><p class="mt-2 text-black/60">Аянттын архитектуралык фонунун өзү. Кыргызстандын тарыхына киришүү үчүн эң логикалуу кийинки кадам.</p></article>
+              <article class="card-stone rounded-3xl p-7"><h3 class="text-xl font-bold">Эмен багы</h3><p class="mt-2 text-black/60">Көлөкөлүү аллеялар, скульптуралар жана тынч атмосфера — аянттын ачык мейкиндигинен кийин жакшы контраст.</p></article>
+              <article class="card-stone rounded-3xl p-7"><h3 class="text-xl font-bold">Эркиндик бульвары</h3><p class="mt-2 text-black/60">Дарактуу жөө огу борборду түштүккө карай улантып, шаардык сейилдөөгө ыңгайлуу багыт түзөт.</p></article>
+              <article class="card-stone rounded-3xl p-7"><h3 class="text-xl font-bold">Панфилов паркы</h3><p class="mt-2 text-black/60">Борбордогу жашыл эс алуу мейкиндиги; үй-бүлөлүк сейилдөө же кыска тыныгуу үчүн ыңгайлуу.</p></article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-rule px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="grid gap-12 lg:grid-cols-2">
+            <div class="rounded-[2rem] bg-[#f8f4ec] p-8 md:p-10">
+              <p class="eyebrow text-[var(--red)]">Жакынкы тамак-аш</p>
+              <h2 class="display mt-4 text-4xl font-bold md:text-5xl">Борбордо эмне татып көрүү керек?</h2>
+              <p class="mt-5 text-black/65">Чүй проспектиси менен Эркиндик бульварынын айланасында кыргыз ашканасы, кофе жана жеңил тамак сунуштаган жайлар көп.</p>
+              <div class="mt-7 flex flex-wrap gap-2 text-sm font-bold">
+                <span class="rounded-full border border-black/20 px-4 py-2">бешбармак</span>
+                <span class="rounded-full border border-black/20 px-4 py-2">лагман</span>
+                <span class="rounded-full border border-black/20 px-4 py-2">манты</span>
+                <span class="rounded-full border border-black/20 px-4 py-2">боорсок</span>
+                <span class="rounded-full border border-black/20 px-4 py-2">кымыз</span>
+              </div>
+              <p class="mt-7 text-sm text-black/55">Тез тамактануу керек болсо Чүй проспектисинин кафелерин, жайыраак кечки тамак үчүн борбордук кыргыз ресторандарын караңыз.</p>
+            </div>
+            <div class="rounded-[2rem] bg-[#ede4d5] p-8 md:p-10">
+              <p class="eyebrow text-[var(--red)]">Кайда түнөө керек?</p>
+              <h2 class="display mt-4 text-4xl font-bold md:text-5xl">Борбордо жөө жетчү жерди тандаңыз</h2>
+              <p class="mt-5 text-black/65">Аянтты эртең менен жана кечинде көргүңүз келсе, Чүй проспектиси, Эркиндик бульвары же Раззаков көчөсүнө жакын мейманкана ыңгайлуу. Тынчтык маанилүү болсо, негизги проспекттен бир-эки квартал ичкеридеги көчөлөрдү тандаңыз.</p>
+              <ul class="mt-7 space-y-3 text-sm text-black/60">
+                <li>✓ Аянтка 5–15 мүнөт жөө аралык — эң практикалык.</li>
+                <li>✓ Эртең мененки сейилдөө үчүн Эркиндик бульварына жакындык жакшы.</li>
+                <li>✓ Иш-чара күндөрүндө борбордо жол жабылышын эске алыңыз.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" class="bg-[#ded4c5] px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto grid max-w-[1200px] gap-10 lg:grid-cols-[.65fr_1.35fr]">
+          <div><p class="eyebrow text-[var(--red)]">FAQ</p><h2 class="display mt-4 text-5xl font-bold">Көп берилген суроолор</h2></div>
+          <div class="divide-y divide-black/15 border-y border-black/15">
+            {faq.map((item) => (
+              <details class="group py-6">
+                <summary class="flex cursor-pointer list-none items-start justify-between gap-6 text-lg font-bold">
+                  {item.q}<span class="text-2xl font-normal text-[var(--red)] transition-transform group-open:rotate-45">+</span>
+                </summary>
+                <p class="max-w-2xl pt-4 text-black/65">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-[#171410] px-5 py-12 text-white md:px-10">
+      <div class="mx-auto max-w-[1360px]">
+        <div class="grid gap-10 border-b border-white/15 pb-10 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <img src="/logo.svg" width="350" height="80" alt="Ала-Тоо — Бишкек аянты" class="h-auto w-[280px] brightness-0 invert" />
+            <p class="mt-5 max-w-xl text-sm text-white/55">Бишкектин борборун түшүнүүнү Ала-Тоо аянтынан баштаңыз: тарых, масштаб жана күнүмдүк шаар турмушу бир жерде.</p>
+          </div>
+          <div class="text-sm text-white/60 md:text-right">
+            <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="block hover:text-white">Google Карталар ↗</a>
+            <a href="#top" class="mt-2 block hover:text-white">Жогору кайтуу ↑</a>
+          </div>
+        </div>
+        <div class="mt-8 grid gap-6 text-xs text-white/45 md:grid-cols-2">
+          <p>Бул сайт Ала-Тоо аянтынын, Бишкек мэриясынын же Кыргыз Республикасынын мамлекеттик органдарынын расмий сайты эмес.</p>
+          <p class="md:text-right">Сүрөттөр: Wikimedia Commons авторлору; лицензиялар жана атрибуциялар <a href="/IMAGE_CREDITS.txt" class="underline">сүрөт кредиттеринде</a> көрсөтүлгөн.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

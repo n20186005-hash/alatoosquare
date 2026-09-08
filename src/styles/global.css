@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #171410;
+  --paper: #f3efe6;
+  --paper-2: #e7dfd1;
+  --red: #a92b26;
+  --red-deep: #6f1717;
+  --gold: #c59545;
+  --stone: #968b7b;
+  --line: rgba(23, 20, 16, 0.18);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--paper); }
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(197,149,69,.12), transparent 28rem),
+    var(--paper);
+  font-family: "Segoe UI", Arial, sans-serif;
+  line-height: 1.6;
+}
+::selection { background: var(--red); color: white; }
+a { color: inherit; }
+
+.display {
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.035em;
+  line-height: .96;
+}
+.eyebrow {
+  font-size: .73rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: .19em;
+  font-weight: 800;
+}
+.knot-line {
+  background-image:
+    linear-gradient(45deg, transparent 44%, currentColor 45%, currentColor 55%, transparent 56%),
+    linear-gradient(-45deg, transparent 44%, currentColor 45%, currentColor 55%, transparent 56%);
+  background-size: 18px 18px;
+  height: 8px;
+  opacity: .36;
+}
+.section-rule { border-top: 1px solid var(--line); }
+.card-stone {
+  background: rgba(255,255,255,.36);
+  border: 1px solid var(--line);
+  box-shadow: 0 22px 60px rgba(48,37,22,.06);
+}
+.hero-mask::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(18,14,12,.18), rgba(18,14,12,.22) 35%, rgba(18,14,12,.80) 100%);
+  pointer-events: none;
+}
+.grid-paper {
+  background-image:
+    linear-gradient(rgba(23,20,16,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23,20,16,.045) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.red-panel {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.06), transparent 40%),
+    var(--red-deep);
+  color: #fffaf0;
+}
+.map-frame iframe { filter: saturate(.88) contrast(1.03); }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
