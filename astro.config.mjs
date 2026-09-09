@@ -3,13 +3,13 @@ import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-const configuredSite = process.env.SITE_URL?.trim() || undefined;
+const siteUrl = process.env.SITE_URL?.trim() || 'https://alatoosquare.com';
 
 export default defineConfig({
-  site: configuredSite,
+  site: siteUrl,
   output: 'server',
   adapter: cloudflare(),
-  integrations: configuredSite ? [sitemap()] : [],
+  integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],
   },

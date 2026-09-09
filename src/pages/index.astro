@@ -1,25 +1,39 @@
 ---
 import '../styles/global.css';
-import { attraction, imageSources, faq } from '../data/site';
+import { attraction, imageSources, faq, sources, contentUpdated } from '../data/site';
 
 export const prerender = true;
 
-const siteOrigin = Astro.site;
-const canonicalUrl = siteOrigin ? new URL(Astro.url.pathname, siteOrigin).toString() : undefined;
-const title = 'Ала-Тоо аянты — Бишкектин башкы аянты | Баруу боюнча колдонмо';
-const description = attraction.description;
+const siteUrl = (Astro.site ? Astro.site.toString() : 'https://alatoosquare.com').replace(/\/$/, '');
+const canonicalUrl = `${siteUrl}/`;
+const absUrl = (path: string) => new URL(path, siteUrl).toString();
+
+const title = 'Ала-Тоо аянты (Ala-Too Square) — Бишкек, Кыргызстан | Колдонмо жана карта';
+const description =
+  'Ала-Тоо аянты (Ala-Too Square) — Бишкектин борбордук аянты: Манас эстелиги, Кыргыз улуттук тарых музейи, фонтандар жана желек мамысы. 24 саат акысыз; так карта, тарых, жакынкы жерлер жана баруу кеңештери.';
+
+const heroImage = imageSources[0].src;
 
 const attractionSchema = {
   '@context': 'https://schema.org',
   '@type': 'TouristAttraction',
-  name: attraction.name,
-  alternateName: attraction.alternateName,
-  ...(canonicalUrl ? { url: canonicalUrl } : {}),
-  description,
+  '@id': `${siteUrl}/#attraction`,
+  name: attraction.alternateName,
+  alternateName: [
+    attraction.fullName,
+    `Бишкектеги ${attraction.fullName}`,
+    `${attraction.alternateName}, Bishkek`,
+  ],
+  description:
+    'Airy public square featuring landmark monuments and structures, including the State History Museum. Кыргызча аталышы: Ала-Тоо аянты.',
+  url: canonicalUrl,
+  image: imageSources.map((img) => absUrl(img.src)),
+  isAccessibleForFree: true,
   address: {
     '@type': 'PostalAddress',
-    streetAddress: attraction.address.streetAddress,
-    addressLocality: attraction.address.addressLocality,
+    streetAddress: attraction.address.streetAddressEn,
+    addressLocality: attraction.address.addressLocalityEn,
+    addressRegion: attraction.address.addressRegion,
     addressCountry: attraction.address.addressCountry,
   },
   geo: {
@@ -27,7 +41,7 @@ const attractionSchema = {
     latitude: attraction.geo.latitude,
     longitude: attraction.geo.longitude,
   },
-  isAccessibleForFree: true,
+  hasMap: attraction.mapsUrl,
   openingHoursSpecification: {
     '@type': 'OpeningHoursSpecification',
     dayOfWeek: [
@@ -41,6 +55,7 @@ const attractionSchema = {
     ratingValue: attraction.rating.value,
     reviewCount: attraction.rating.count,
   },
+  sameAs: sources.map((s) => s.url),
 };
 
 const faqSchema = {
@@ -56,7 +71,7 @@ const faqSchema = {
   })),
 };
 
-const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579214913649!2d74.60103957751176!3d42.87533647114969!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x389eb7dcbdacf87b%3A0xfc7d686ab988f348!2sAla-Too%20Square!5e1!3m2!1sky!2skg!4v1788736424702!5m2!1sky!2skg&hl=ky&gl=kg';
+const mapEmbed = attraction.mapsEmbedSrc;
 ---
 <!doctype html>
 <html lang="ky">
@@ -67,24 +82,42 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
     <meta name="theme-color" content="#8e211f" />
     <meta name="robots" content="index,follow,max-image-preview:large" />
     <title>{title}</title>
-    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <link rel="canonical" href={canonicalUrl} />
 
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ky_KG" />
+    <meta property="og:site_name" content="Ала-Тоо аянты (Ala-Too Square)" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={absUrl(heroImage)} />
+    <meta property="og:image:alt" content="Ала-Тоо аянты (Ala-Too Square) — Бишкек, Кыргызстан" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={absUrl(heroImage)} />
+    <meta name="twitter:image:alt" content="Ала-Тоо аянты (Ala-Too Square) — Бишкек, Кыргызстан" />
 
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Ала-Тоо аянты" />
 
     <script type="application/ld+json" set:html={JSON.stringify(attractionSchema)}></script>
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          if (location.protocol !== 'https:') return;
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
+    </script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXM22WWPKP"></script>
     <script is:inline>
@@ -101,7 +134,7 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
       <div class="mx-auto flex max-w-[1500px] items-center justify-between border-b border-white/30 pb-4">
         <a href="#top" class="flex items-center gap-3 font-bold" aria-label="Ала-Тоо аянты — башкы бет">
           <img src="/icons/favicon.svg" width="42" height="42" alt="" class="rounded-xl" />
-          <span class="text-sm tracking-[.16em] uppercase">Ала-Тоо · Бишкек</span>
+          <span class="text-sm tracking-[.16em] uppercase">Ала-Тоо аянты · Бишкек</span>
         </a>
         <nav aria-label="Негизги навигация" class="hidden gap-6 text-sm font-semibold md:flex">
           <a href="#history" class="hover:opacity-70">Тарых</a>
@@ -128,12 +161,19 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
             <div>
               <div class="mb-5 flex items-center gap-3">
                 <span class="h-px w-12 bg-[#e6b95f]"></span>
-                <span class="eyebrow text-[#f4d89c]">Бишкектин борбордук аянты</span>
+                <span class="eyebrow text-[#f4d89c]">Бишкектин борбордук аянты · Historical Landmark</span>
               </div>
-              <h1 class="display max-w-5xl text-[clamp(4rem,12vw,10rem)] font-bold">Ала-Тоо</h1>
-              <p class="mt-5 max-w-3xl text-lg text-white/85 md:text-2xl">
+              <h1 class="display max-w-6xl font-bold leading-[1.02]">
+                <span class="block text-[clamp(3.4rem,10vw,8rem)]">Ала-Тоо аянты</span>
+                <span class="mt-4 block text-[clamp(1.2rem,2.4vw,2rem)] font-semibold tracking-tight text-[#f4d89c]">Ala-Too Square · Бишкек (Bishkek), Кыргызстан</span>
+              </h1>
+              <p class="mt-6 max-w-3xl text-lg text-white/85 md:text-2xl">
                 Манас эстелиги, тарых музейи, фонтандар жана шаардын чоң салтанаттары бириккен Бишкектин жандуу жүрөгү.
               </p>
+              <div class="mt-7 flex flex-wrap gap-3 text-sm font-bold">
+                <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="rounded-full bg-[#e6b95f] px-6 py-3 text-[#201b17] transition hover:bg-[#f4d89c]">Google Карталарда ачуу ↗</a>
+                <a href="#history" class="rounded-full border border-white/40 px-6 py-3 text-white transition hover:bg-white/10">Тарых жана маани</a>
+              </div>
             </div>
             <aside class="border-l border-white/30 pl-6 text-sm text-white/85">
               <div class="mb-6 text-5xl font-light text-[#f4d89c]">42.8753°N</div>
@@ -151,17 +191,31 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
 
       <section class="grid-paper px-5 py-20 md:px-10 md:py-28">
         <div class="mx-auto max-w-[1360px]">
+          <nav aria-label="Breadcrumb" class="mb-10 flex flex-wrap items-center gap-2 text-sm font-bold text-black/55">
+            <a href="#top" class="underline-offset-4 hover:underline">Ала-Тоо аянты</a>
+            <span aria-hidden="true">›</span>
+            <span class="text-black/40">Бишкек</span>
+            <span aria-hidden="true">›</span>
+            <span class="text-black/40">Кыргызстан</span>
+          </nav>
           <div class="grid gap-12 lg:grid-cols-[.7fr_1.3fr]">
             <div>
               <p class="eyebrow text-[var(--red)]">Эмне үчүн баруу керек?</p>
-              <h2 class="display mt-5 text-5xl font-bold md:text-7xl">Бир аянтта — шаардын мүнөзү</h2>
+              <h2 class="display mt-5 text-5xl font-bold md:text-7xl">Ала-Тоо аянты жөнүндө</h2>
+              <p class="mt-6 text-base font-bold uppercase tracking-widest text-black/40">Ala-Too Square · Bishkek · Kyrgyzstan</p>
             </div>
             <div class="grid gap-6 md:grid-cols-2">
+              <p class="text-xl leading-relaxed md:text-2xl">
+                «Ала-Тоо аянты» — эл аралык аталышы <strong>Ala-Too Square</strong> — Кыргызстандын борбору Бишкек шаарынын жүрөгүндө жайгашкан башкы коомдук аянт жана тарыхый эстелик. Мамлекеттик салтанаттар, Манас эстелиги, улуттук тарых музейи жана фонтандар ушул жерде топтолот.
+              </p>
               <p class="text-xl leading-relaxed md:text-2xl">
                 Ала-Тоо аянты — жөн гана кең мейкиндик эмес. Бул жерде Кыргызстандын мамлекеттик символдору, советтик доордун масштабдуу архитектурасы жана бүгүнкү Бишкектин коомдук турмушу катмарланып көрүнөт.
               </p>
               <p class="text-base leading-relaxed text-black/65 md:text-lg">
                 Кең борбордук огу, Манастын монументалдык айкели, Мамлекеттик тарых музейинин ак таш фасады, желек мамысы жана фонтандар аянтты шаарды түшүнүү үчүн эң ыңгайлуу баштапкы чекит кылат.
+              </p>
+              <p class="text-base leading-relaxed text-black/65 md:text-lg">
+                Ала-Тоо аянтынан жөө аралыкта <strong>Эмен багы (Oak Park)</strong> жана <strong>Эркиндик бульвары (Erkindik Boulevard)</strong> сыяктуу көрүнүктүү тарыхый жерлер жайгашкан — алар менен бирге борбордук Бишкекти бир күндө эле кыдырып чыгууга болот.
               </p>
             </div>
           </div>
@@ -172,8 +226,8 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
         <div class="mx-auto max-w-[1360px]">
           <div class="mb-14 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <p class="eyebrow text-[var(--red)]">Тарых жана маани</p>
-              <h2 class="display mt-4 text-5xl font-bold md:text-7xl">1984-жылдан бүгүнкүгө</h2>
+              <p class="eyebrow text-[var(--red)]">Тарых жана маани · History</p>
+              <h2 class="display mt-4 text-5xl font-bold md:text-7xl">Ала-Тоо аянтынын тарыхы</h2>
             </div>
             <p class="max-w-xl text-black/60">Аянттын эстеликтери алмашкан сайын өлкөнүн саясий жана маданий символикасы да өзгөрүп келген.</p>
           </div>
@@ -265,7 +319,7 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
 
       <section id="visit" class="section-rule grid-paper px-5 py-20 md:px-10 md:py-28">
         <div class="mx-auto max-w-[1360px]">
-          <div class="mb-12"><p class="eyebrow text-[var(--red)]">Практикалык маалымат</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Барууну пландаңыз</h2></div>
+          <div class="mb-12"><p class="eyebrow text-[var(--red)]">Практикалык маалымат · Location</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Ала-Тоо аянтына баруу</h2></div>
           <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             <article class="card-stone rounded-3xl p-7"><div class="text-sm font-bold text-[var(--red)]">01 · Убакыт</div><h3 class="mt-4 text-2xl font-bold">24 саат ачык</h3><p class="mt-3 text-black/60">Ачык коомдук аянт. Ири иш-чараларда айрым секторлор убактылуу чектелиши мүмкүн.</p></article>
             <article class="card-stone rounded-3xl p-7"><div class="text-sm font-bold text-[var(--red)]">02 · Баа</div><h3 class="mt-4 text-2xl font-bold">Кирүү акысыз</h3><p class="mt-3 text-black/60">Аянт үчүн билет жок. Музей жана атайын иш-чаралар өзүнчө бааланат.</p></article>
@@ -278,8 +332,8 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
       <section class="px-5 py-20 md:px-10 md:py-28">
         <div class="mx-auto grid max-w-[1360px] gap-12 lg:grid-cols-2">
           <div>
-            <p class="eyebrow text-[var(--red)]">Толук транспорт</p>
-            <h2 class="display mt-4 text-5xl font-bold">Кантип жетүүгө болот?</h2>
+            <p class="eyebrow text-[var(--red)]">Толук транспорт · How to get there</p>
+            <h2 class="display mt-4 text-5xl font-bold">Ала-Тоо аянтына кантип жетүүгө болот?</h2>
             <div class="mt-8 space-y-6">
               <div class="border-l-2 border-[var(--red)] pl-5"><h3 class="font-bold">Жөө</h3><p class="mt-1 text-black/60">Бишкектин борборунда болсоңуз, аянт Чүй проспектиси, Эркиндик бульвары жана Эмен багы менен жөө маршрутка оңой кошулат.</p></div>
               <div class="border-l-2 border-[var(--red)] pl-5"><h3 class="font-bold">Коомдук транспорт</h3><p class="mt-1 text-black/60">Борборду кесип өткөн автобус жана маршруттук каттамдар Чүй проспектисине жакын токтойт. Каттамдар өзгөрүп турушу мүмкүн, ошондуктан ошол күнкү шаардык транспорт картасынан «Ала-Тоо аянты» багытын текшериңиз.</p></div>
@@ -300,8 +354,12 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
       <section id="map" class="bg-[#1d1916] px-5 py-20 text-white md:px-10 md:py-28">
         <div class="mx-auto max-w-[1360px]">
           <div class="mb-8 grid gap-6 md:grid-cols-2 md:items-end">
-            <div><p class="eyebrow text-[#e6b95f]">Карта</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Бишкектин так борборунда</h2></div>
-            <address class="not-italic text-white/65 md:text-right">Раззаков көчөсү 51, Бишкек, Кыргызстан<br />VJG3+7F</address>
+            <div><p class="eyebrow text-[#e6b95f]">Карта жана жайгашкан жери · Map</p><h2 class="display mt-4 text-5xl font-bold md:text-7xl">Ала-Тоо аянты — Бишкектин так борборунда</h2></div>
+            <address class="not-italic text-white/70 md:text-right">
+              <strong class="block font-bold text-white">Ala-Too Square</strong>
+              <span class="block">51 Razzakov St, Bishkek, Kyrgyzstan · VJG3+7F</span>
+              <span class="block text-white/50">Раззаков көчөсү 51, Бишкек, Кыргызстан</span>
+            </address>
           </div>
           <div class="map-frame overflow-hidden rounded-[2rem] border border-white/15 bg-white/5">
             <iframe
@@ -312,10 +370,15 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
               allowfullscreen
               loading="lazy"
               referrerpolicy="strict-origin-when-cross-origin"
-              title="Ала-Тоо аянтынын Google картасы"
+              title="Ала-Тоо аянты (Ala-Too Square) — Бишкектин Google картасы"
             ></iframe>
           </div>
-          <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[#e6b95f]">Google Карталарда ачуу ↗</a>
+          <div class="mt-6 flex flex-col gap-3 text-sm font-bold text-[#e6b95f] md:flex-row md:items-center md:justify-between">
+            <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 hover:text-white">Google Карталарда ачуу ↗</a>
+            <p class="m-0 font-semibold text-white/55">
+              Расмий маалымат үчүн: <a href="https://historymuseum.kg/" target="_blank" rel="noopener noreferrer" class="text-[#e6b95f] underline underline-offset-4 hover:text-white">Кыргыз Республикасынын улуттук тарых музейи — расмий сайт</a>
+            </p>
+          </div>
         </div>
       </section>
 
@@ -323,8 +386,8 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
         <div class="mx-auto max-w-[1360px]">
           <div class="grid gap-12 lg:grid-cols-3">
             <div>
-              <p class="eyebrow text-[var(--red)]">Жакынкы жерлер</p>
-              <h2 class="display mt-4 text-5xl font-bold">Бир күндүк борбордук кластер</h2>
+              <p class="eyebrow text-[var(--red)]">Жакынкы жерлер · Nearby Landmarks</p>
+              <h2 class="display mt-4 text-5xl font-bold">Ала-Тоо аянтынын айланасындагы жерлер</h2>
             </div>
             <div class="lg:col-span-2 grid gap-4 md:grid-cols-2">
               <article class="card-stone rounded-3xl p-7"><h3 class="text-xl font-bold">Мамлекеттик тарых музейи</h3><p class="mt-2 text-black/60">Аянттын архитектуралык фонунун өзү. Кыргызстандын тарыхына киришүү үчүн эң логикалуу кийинки кадам.</p></article>
@@ -381,23 +444,60 @@ const mapEmbed = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5002.579
           </div>
         </div>
       </section>
+
+      <section id="sources" class="px-5 py-20 md:px-10 md:py-28">
+        <div class="mx-auto max-w-[1360px]">
+          <div class="mb-12 grid gap-6 lg:grid-cols-[.7fr_1.3fr] lg:items-end">
+            <div>
+              <p class="eyebrow text-[var(--red)]">Булактар · Sources</p>
+              <h2 class="display mt-4 text-5xl font-bold md:text-6xl">Расмий жана ишенимдүү булактар</h2>
+            </div>
+            <p class="max-w-xl text-black/60 md:justify-self-end">
+              Ала-Тоо аянты жөнүндөгү маалыматтар музейдин расмий сайтына, Wikipedia'га жана Google Карталарга таянат. Сапар алдында расмий булактардан учурдагы абалды текшериңиз.
+            </p>
+          </div>
+          <ul class="grid gap-4 md:grid-cols-2">
+            {sources.map((s) => (
+              <li class="card-stone flex items-start justify-between gap-4 rounded-2xl p-6">
+                <span class="text-sm font-bold leading-relaxed text-black/70">{s.label}</span>
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="whitespace-nowrap rounded-full border border-black/25 px-4 py-2 text-xs font-bold text-black/70 transition hover:bg-black hover:text-white"
+                  >Ачуу ↗</a
+                >
+              </li>
+            ))}
+          </ul>
+          <p class="mt-8 text-xs text-black/45">
+            Маалымат акыркы жаңыртылган: {contentUpdated}. Бул сайт Ала-Тоо аянтынын, Бишкек мэриясынын же Кыргыз Республикасынын мамлекеттик органдарынын расмий сайты эмес.
+          </p>
+        </div>
+      </section>
     </main>
 
     <footer class="bg-[#171410] px-5 py-12 text-white md:px-10">
       <div class="mx-auto max-w-[1360px]">
         <div class="grid gap-10 border-b border-white/15 pb-10 md:grid-cols-[1fr_auto] md:items-end">
           <div>
-            <img src="/logo.svg" width="350" height="80" alt="Ала-Тоо — Бишкек аянты" class="h-auto w-[280px] brightness-0 invert" />
+            <img src="/logo.svg" width="350" height="80" alt="Ала-Тоо аянты (Ala-Too Square) — Бишкектин башкы аянты" class="h-auto w-[280px] brightness-0 invert" />
             <p class="mt-5 max-w-xl text-sm text-white/55">Бишкектин борборун түшүнүүнү Ала-Тоо аянтынан баштаңыз: тарых, масштаб жана күнүмдүк шаар турмушу бир жерде.</p>
+            <p class="mt-4 text-xs font-bold uppercase tracking-widest text-white/35">Ala-Too Square · 51 Razzakov St, Bishkek, Kyrgyzstan</p>
           </div>
           <div class="text-sm text-white/60 md:text-right">
             <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="block hover:text-white">Google Карталар ↗</a>
             <a href="#top" class="mt-2 block hover:text-white">Жогору кайтуу ↑</a>
           </div>
         </div>
-        <div class="mt-8 grid gap-6 text-xs text-white/45 md:grid-cols-2">
-          <p>Бул сайт Ала-Тоо аянтынын, Бишкек мэриясынын же Кыргыз Республикасынын мамлекеттик органдарынын расмий сайты эмес.</p>
-          <p class="md:text-right">Сүрөттөр: Wikimedia Commons авторлору; лицензиялар жана атрибуциялар <a href="/IMAGE_CREDITS.txt" class="underline">сүрөт кредиттеринде</a> көрсөтүлгөн.</p>
+        <div class="mt-8 grid gap-4 text-xs text-white/45 md:grid-cols-2">
+          <div>
+            <p>Бул сайт Ала-Тоо аянтынын, Бишкек мэриясынын же Кыргыз Республикасынын мамлекеттик органдарынын расмий сайты эмес.</p>
+            <p class="mt-3 text-white/30">Маалымат акыркы жаңыртылган: {contentUpdated}.</p>
+          </div>
+          <p class="md:text-right">
+            Бул сайтта көрсөтүлгөн бардык сүрөттөрдүн укуктары жана автордук укугу алардын түпнуска фотографтарына таандык. Толук атрибуция: <a href="/IMAGE_CREDITS.txt" class="underline">сүрөт кредиттери</a>.
+          </p>
         </div>
       </div>
     </footer>

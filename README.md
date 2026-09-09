@@ -12,11 +12,19 @@
 - pnpm 12.3.4
 - Node.js 24.20.0
 
-## Доменди бир жерден коюу
+## Домен жана SEO
 
-Продакшн домени `SITE_URL` чөйрө өзгөрмөсү аркылуу гана `astro.config.mjs` ичинде окулат. Маани берилбесе сайт баары бир курулат: canonical жана `og:url` чыгарылбайт, sitemap интеграциясы кошулбайт.
+Продакшн домени — **https://alatoosquare.com** (`astro.config.mjs` ичинде демейки коюлган; керек болсо `SITE_URL` чөйрө өзгөрмөсү менен алмаштырылат). canonical, `og:url` жана sitemap интеграциясы ар дайым иштетилет.
 
-Домен белгилүү болгондо `SITE_URL` маанисин чыныгы HTTPS origin менен берип кайра билд жасаңыз.
+Сайтта Google энтитиси менен байланыш үчүн төмөнкүлөр бар:
+- `TouristAttraction` JSON-LD: `@id`, `image` (жергиликтүү), NAP (51 Razzakov St, Bishkek), `geo`, `hasMap`, `aggregateRating` 4.5 × 21 878, `sameAs`;
+- `FAQPage` JSON-LD (7 суроо);
+- TDK/OG/twitter meta + биринчи сүрөт (og:image абсолюттук);
+- H1/H2 энтити байланган («Ала-Тоо аянты жөнүндө», «Ала-Тоо аянтынын тарыхы» ж.б.), географиялык цепочка (Ала-Тоо аянты › Бишкек › Кыргызстан);
+- MapEmbed — Google Maps'тин так pb embed src; карта алдында расмий (historymuseum.kg) шилтеме;
+- «Булактар» (Sources) секциясы (E-E-A-T);
+- PWA: `public/manifest.webmanifest` + `public/sw.js` + `public/icons/icon-{192,512}.png` (2026-09-09 генерацияланган);
+- `public/robots.txt` → `sitemap-index.xml`.
 
 ## Командалар
 
@@ -35,12 +43,17 @@ pnpm deploy
 
 ## Сүрөттөр
 
-Сайттагы үч фотосүрөт Wikimedia Commons'тагы эркин лицензияланган реалдуу фотолор. Атрибуция `public/IMAGE_CREDITS.txt` файлында берилген.
+Сайттагы үч фотосүрөт Wikimedia Commons'тагы эркин лицензияланган реалдуу фотолор жана **жергиликтүү** сакталат (`public/images/`). Атрибуция `public/IMAGE_CREDITS.txt` файлында берилген. Сайттагы бардык сүрөттөрдүн автордук укугу түпнуска фотографтарга таандык (footer'до жазылган).
 
-## Текшерүү статусу
+## Текшерүү статусу (2026-09-09)
 
-Бул пакет даярдалган контейнерде npm/Wikimedia тармагына чыгуу жабык болгондуктан, lockfile генерациясы жана таза CI build аткарылган жок. Так чектөө жана текшерүү кадамдары `BUILD_STATUS.md` менен `scripts/verify.sh` ичинде жазылган. Жасалма lockfile кошулган эмес.
+- `npm install` (online) — ийгиликтүү, 332 пакет; node v24.14.0 vs engines 24.20.0 — EBADENGINE эскертүүсү гана;
+- `npm run build` (astro build, Cloudflare adapter) — ийгиликтүү: `dist/client` + `dist/server` түзүлдү;
+- `scripts/verify-build-output.mjs` — PASS (canonical/OG/PWA/локальдүү сүрөттөр/NAP/JSON-LD);
+- `astro check` толук логу фоондо калды, `read_lints` 0 ката. CI'де `pnpm check` кошумча аткарыңыз.
 
-## Сүрөттөрдү толук локалдаштыруу
+Толук маалымат `BUILD_STATUS.md` жана `scripts/verify.sh` ичинде. Репозиторийде жасалма `pnpm-lock.yaml` жок — биринчи deploy алдында интернет менен `pnpm install` аткарыңыз.
 
-Учурдагы контейнер сүрөт байттарын жүктөй албагандыктан сайт реалдуу Commons JPG даректерин колдонот. Интернет жеткиликтүү чөйрөдө `bash scripts/localize-images.sh` иштетсеңиз, үч сүрөт `public/images/` ичине жүктөлүп, код локалдык жолдорго автоматтык өтөт. Булак жана лицензия маалыматтары `PHOTO_SOURCES.md` жана `public/IMAGE_CREDITS.txt` файлдарында.
+## Сүрөттөр жергиликтүү
+
+Үч сүрөт Wikimedia Commons'тан алынып, **жергиликтүү** `public/images/*.jpg` катары сакталып, `src/data/site.ts` ичиндеги `imageSources` аларды колдонот (алыскы URL жок). Булак жана лицензия маалыматтары `PHOTO_SOURCES.md` жана `public/IMAGE_CREDITS.txt` файлдарында. PWA иконкалары `scripts/generate-pwa-icons.ps1` менен кайра түзүлөт.

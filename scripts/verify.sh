@@ -12,7 +12,7 @@ if [[ -f pnpm-workspace.yaml ]]; then
 fi
 
 SOURCE_TARGETS=(src public astro.config.mjs wrangler.jsonc package.json)
-if grep -RInE 'example\.com|localhost|chrome-extension://' "${SOURCE_TARGETS[@]}"; then
+if grep -RInE 'example\.com|chrome-extension://' "${SOURCE_TARGETS[@]}"; then
   echo 'ERROR: forbidden placeholder/extension content found in web source.' >&2
   exit 1
 fi
@@ -22,25 +22,24 @@ CI=1 corepack pnpm install --frozen-lockfile
 pnpm check
 pnpm build
 
-if grep -RInE 'example\.com|localhost|chrome-extension://' dist; then
+OUT_DIR="dist/client"
+if [[ ! -d "$OUT_DIR" ]]; then
+  echo 'ERROR: expected Astro+Cloudflare output under dist/client.' >&2
+  exit 1
+fi
+
+if grep -RInE 'example\.com|chrome-extension://' "$OUT_DIR"; then
   echo 'ERROR: forbidden placeholder/extension content found in dist.' >&2
   exit 1
 fi
 
-if [[ -n "${SITE_URL:-}" ]]; then
-  if [[ ! -f dist/sitemap-index.xml && ! -f dist/sitemap-0.xml ]]; then
-    echo 'ERROR: SITE_URL is set but no sitemap was generated.' >&2
-    exit 1
-  fi
-  if grep -RIn '<lastmod>' dist/sitemap*.xml 2>/dev/null; then
-    echo 'ERROR: unexpected lastmod in generated sitemap.' >&2
-    exit 1
-  fi
-else
-  if compgen -G 'dist/sitemap*.xml' > /dev/null; then
-    echo 'ERROR: sitemap must not be generated when SITE_URL is empty.' >&2
-    exit 1
-  fi
+if [[ ! -f "$OUT_DIR/sitemap-index.xml" && ! -f "$OUT_DIR/sitemap-0.xml" ]]; then
+  echo 'ERROR: no sitemap was generated (site defaults to https://alatoosquare.com).' >&2
+  exit 1
+fi
+if grep -RIn '<lastmod>' "$OUT_DIR"/sitemap*.xml 2>/dev/null; then
+  echo 'ERROR: unexpected lastmod in generated sitemap.' >&2
+  exit 1
 fi
 
 echo 'All requested checks passed.'

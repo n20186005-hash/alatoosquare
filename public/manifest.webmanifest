@@ -1,0 +1,31 @@
+{
+  "name": "Ала-Тоо аянты (Ala-Too Square) — Бишкек туристтик колдонмо",
+  "short_name": "Ала-Тоо аянты",
+  "description": "Ала-Тоо аянты (Ala-Too Square) жөнүндөгү колдонмо: карта, тарых, Манас эстелиги, Кыргыз улуттук тарых музейи жана жакынкы жерлер.",
+  "lang": "ky",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f3efe6",
+  "theme_color": "#8e211f",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
