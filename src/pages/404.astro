@@ -1,0 +1,39 @@
+---
+import '../styles/global.css';
+import { content } from '../content';
+import { contentUpdated } from '../data/site';
+
+export const prerender = true;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex,follow" />
+    <title>Page not found · Ala-Too Square Bishkek</title>
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <meta name="theme-color" content="#8e211f" />
+  </head>
+  <body>
+    <main class="mx-auto max-w-[900px] px-5 py-24">
+      <p class="eyebrow text-[var(--red)]">404</p>
+      <h1 class="display mt-4 text-5xl font-bold md:text-7xl">Page not found</h1>
+      <p class="mt-6 text-lg text-black/65">
+        Ala-Too Square (Ала-Тоо аянты) — the central square of Bishkek, Kyrgyzstan. Choose a language:
+      </p>
+      <ul class="mt-8 space-y-3 text-lg font-bold">
+        <li><a href="/" class="underline underline-offset-4">Кыргызча — Ала-Тоо аянты</a></li>
+        <li><a href="/ru/" class="underline underline-offset-4">Русский — площадь Ала-Тоо</a></li>
+        <li><a href="/en/" class="underline underline-offset-4">English — Ala-Too Square</a></li>
+      </ul>
+      <ul class="mt-10 space-y-2 text-sm text-black/55">
+        <li><a href="/karuul-almashuu/" class="underline">{content.ky.articles.guard.h1}</a></li>
+        <li><a href="/ru/smena-karaula/" class="underline">{content.ru.articles.guard.h1}</a></li>
+        <li><a href="/en/guard-changing-ceremony/" class="underline">{content.en.articles.guard.h1}</a></li>
+      </ul>
+      <p class="mt-10 text-xs text-black/40">{contentUpdated}</p>
+    </main>
+  </body>
+</html>

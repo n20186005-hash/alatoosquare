@@ -1,3 +1,22 @@
+import type { Locale } from '../i18n';
+
+/** SEO 站点名统一格式：景点名称 + 城市 + 旅游指南 */
+export const SITE_NAME: Record<Locale, string> = {
+  ky: 'Ала-Тоо аянты Бишкек — туристтик колдонмо',
+  ru: 'Площадь Ала-Тоо Бишкек — путеводитель',
+  en: 'Ala-Too Square Bishkek — Travel Guide',
+};
+
+export function withSiteName(locale: Locale, title: string): string {
+  return `${title} | ${SITE_NAME[locale]}`;
+}
+
+export const attractionNames: Record<Locale, string> = {
+  ky: 'Ала-Тоо аянты',
+  ru: 'Площадь Ала-Тоо',
+  en: 'Ala-Too Square',
+};
+
 export const attraction = {
   fullName: 'Ала-Тоо аянты',
   name: 'Ала-Тоо аянты',
@@ -22,7 +41,7 @@ export const attraction = {
   },
   rating: {
     value: 4.5,
-    count: 21878,
+    count: 21918,
   },
   mapsUrl: 'https://maps.app.goo.gl/ZnzhW6gGWXjCZa5v8',
   mapsEmbedSrc:
@@ -31,12 +50,16 @@ export const attraction = {
   price: 'Акысыз',
 } as const;
 
-export const contentUpdated = '2026-09-09';
+export const contentUpdated = '2026-09-29';
 
 export const sources = [
   {
     label: 'Кыргыз Республикасынын улуттук тарых музейи — расмий сайт',
     url: 'https://historymuseum.kg/',
+  },
+  {
+    label: 'Кыргыз Республикасынын Өкмөтү — расмий портал',
+    url: 'https://www.gov.kg/',
   },
   {
     label: 'Ala-Too Square — Wikipedia (English)',
@@ -76,36 +99,5 @@ export const imageSources = [
     license: 'CC BY 4.0',
     licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
     sourceUrl: 'https://commons.wikimedia.org/wiki/File:Kyrgyz_State_Historical_Museum,_Ala_Too_Square,_Bishkek,_Kyrgyzstan.jpg',
-  },
-] as const;
-
-export const faq = [
-  {
-    q: 'Ала-Тоо аянтына кирүү акы төлөнөбү?',
-    a: 'Жок. Аянт коомдук мейкиндик болгондуктан кадимки күндөрү кирүү акысыз. Музейге же өзүнчө иш-чарага кирүү шарттары башка болушу мүмкүн.',
-  },
-  {
-    q: 'Аянт кайсы убакта ачык?',
-    a: 'Ачык коомдук аянт сутка бою жеткиликтүү. Мамлекеттик майрам, концерт же коопсуздук чаралары маалында айрым бөлүктөрү убактылуу жабылышы мүмкүн.',
-  },
-  {
-    q: 'Ала-Тоо аянты так кайда жайгашкан?',
-    a: 'Аянт Бишкек шаарынын борборунда, Раззаков көчөсү 51 (51 Razzakov St, Bishkek, Kyrgyzstan) дарегинде жайгашкан. Plus Code: VJG3+7F.',
-  },
-  {
-    q: 'Канча убакыт бөлгөн жакшы?',
-    a: 'Аянттын өзүнө 45–90 мүнөт жетиштүү. Мамлекеттик тарых музейин, Эмен багын жана Эркиндик бульварын кошсоңуз, 2–4 сааттык борбордук маршрут ыңгайлуу.',
-  },
-  {
-    q: 'Сүрөткө качан тарткан жакшы?',
-    a: 'Эртең менен адам азыраак болот. Кечкисин жарык жумшарып, фонтандар менен имараттардын жарыгы кадрга атмосфера кошот.',
-  },
-  {
-    q: 'Аянттын жанында дагы кандай көрүнүктүү жерлер бар?',
-    a: 'Аянттын өзүндө Кыргыз улуттук тарых музейи, Манас эстелиги жана фонтандар бар. Жакын жерде Эмен багы (Oak Park), Эркиндик бульвары жана Панфилов паркы жайгашкан.',
-  },
-  {
-    q: 'Унааны кайда токтотсо болот?',
-    a: 'Аянттын өзүндө туристтер үчүн чоң атайын токтотмо жок. Борбордогу белгиленген көчө токтотмолорун же жакынкы соода/ишкер имараттардын акы төлөнүүчү токтотмолорун колдонуңуз; иш-чара күндөрү чектөөлөр болушу мүмкүн.',
   },
 ] as const;

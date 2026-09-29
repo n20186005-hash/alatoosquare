@@ -1,0 +1,11 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import { content } from '../../content';
+
+export const prerender = true;
+
+const locale = 'ru' as const;
+const article = content[locale].articles.transport;
+---
+
+<ArticleLayout locale={locale} article={article} />

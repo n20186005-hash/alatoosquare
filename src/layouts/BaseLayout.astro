@@ -1,0 +1,161 @@
+---
+import '../styles/global.css';
+import { attraction, contentUpdated, imageSources } from '../data/site';
+import { content } from '../content';
+import { localeMeta, locales, localizedPath, hreflangAlternates, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  path?: string;
+  title: string;
+  description: string;
+  schema: Record<string, unknown>[];
+  heroImage?: string;
+  variant?: 'hero' | 'solid';
+}
+
+const { locale, path = '/', title, description, schema, heroImage, variant = 'hero' } = Astro.props;
+
+const siteUrl = (Astro.site ? Astro.site.toString() : 'https://alatoosquare.com').replace(/\/$/, '');
+const selfUrl = `${siteUrl}${localizedPath(locale, path)}`;
+const homeHref = localizedPath(locale, '/');
+const alternates = hreflangAlternates(siteUrl, path);
+const c = content[locale].home;
+
+const ogImagePath = heroImage ? heroImage : imageSources[0].src;
+const ogImageAbs = new URL(ogImagePath, siteUrl).toString();
+
+const navItems = c.nav.map((item) => ({ href: `${homeHref}${item.href}`, label: item.label }));
+const langLinks = locales.map((l) => ({
+  href: `${siteUrl}${localizedPath(l, path)}`,
+  short: localeMeta[l].short,
+  label: localeMeta[l].label,
+  current: l === locale,
+}));
+const otherOgLocales = locales.filter((l) => l !== locale).map((l) => localeMeta[l].ogLocale);
+const updatedLine = `${c.labels.updated} ${contentUpdated}`;
+const brandLine = `${attraction.alternateName} · ${attraction.address.streetAddressEn}, ${attraction.address.addressLocalityEn}, ${attraction.countryEn}`;
+---
+
+<!doctype html>
+<html lang={localeMeta[locale].htmlLang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#8e211f" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <title>{title}</title>
+    <link rel="canonical" href={selfUrl} />
+    {alternates.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={localeMeta[locale].ogLocale} />
+    <meta property="og:site_name" content={c.breadcrumb.home} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={selfUrl} />
+    <meta property="og:image" content={ogImageAbs} />
+    <meta property="og:image:alt" content={imageSources[0].alt} />
+    {otherOgLocales.map((l) => <meta property="og:locale:alternate" content={l} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbs} />
+    <meta name="twitter:image:alt" content={imageSources[0].alt} />
+
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content={c.breadcrumb.home} />
+
+    {schema.map((s) => <script type="application/ld+json" is:inline set:html={JSON.stringify(s)}></script>)}
+
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          if (location.protocol !== 'https:') return;
+          navigator.serviceWorker.register('/sw.js').catch(function () {});
+        });
+      }
+    </script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXM22WWPKP"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HXM22WWPKP');
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2">{c.skip}</a>
+
+    <header
+      class={variant === 'hero'
+        ? 'absolute inset-x-0 top-0 z-30 px-5 py-5 text-white md:px-10'
+        : 'relative z-30 bg-[#171410] px-5 py-5 text-white md:px-10'}
+    >
+      <div class="mx-auto flex max-w-[1500px] items-center justify-between border-b border-white/30 pb-4">
+        <a href={homeHref} class="flex items-center gap-3 font-bold" aria-label={c.breadcrumb.home}>
+          <img src="/icons/favicon.svg" width="42" height="42" alt="" class="rounded-xl" />
+          <span class="text-sm tracking-[.16em] uppercase">{c.breadcrumb.home} · {c.breadcrumb.city}</span>
+        </a>
+        <div class="flex items-center gap-6">
+          <nav aria-label={c.nav.length > 0 ? c.breadcrumb.home : c.breadcrumb.home} class="hidden gap-6 text-sm font-semibold md:flex">
+            {navItems.map((item) => <a href={item.href} class="hover:opacity-70">{item.label}</a>)}
+          </nav>
+          <nav aria-label="Languages" class="flex items-center gap-2 text-xs font-bold">
+            {langLinks.map((l) => (
+              <a
+                href={l.href}
+                aria-current={l.current ? 'page' : undefined}
+                class={l.current
+                  ? 'rounded-full bg-[#e6b95f] px-3 py-1 text-[#201b17]'
+                  : 'rounded-full border border-white/40 px-3 py-1 text-white transition hover:bg-white/10'}
+                >{l.short}</a
+              >
+            ))}
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="bg-[#171410] px-5 py-12 text-white md:px-10">
+      <div class="mx-auto max-w-[1360px]">
+        <div class="grid gap-10 border-b border-white/15 pb-10 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <img src="/logo.svg" width="350" height="80" alt={c.breadcrumb.home} class="h-auto w-[280px] brightness-0 invert" />
+            <p class="mt-5 max-w-xl text-sm text-white/55">{c.footer.tagline}</p>
+            <p class="mt-4 text-xs font-bold uppercase tracking-widest text-white/35">{brandLine}</p>
+            <nav aria-label={c.labels.readMore} class="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-white/70">
+              {c.footer.links.map((l) => <a href={l.href} class="hover:text-white">{l.label}</a>)}
+            </nav>
+          </div>
+          <div class="text-sm text-white/60 md:text-right">
+            <a href={attraction.mapsUrl} target="_blank" rel="noopener noreferrer" class="block hover:text-white">{c.labels.openMap}</a>
+            <a href={homeHref} class="mt-2 block hover:text-white">{c.breadcrumb.home}</a>
+            <a href="#main" class="mt-2 block hover:text-white">{c.labels.top}</a>
+          </div>
+        </div>
+        <div class="mt-8 grid gap-4 text-xs text-white/45 md:grid-cols-2">
+          <div>
+            <p>{c.sources.disclaimer}</p>
+            <p class="mt-3 text-white/30">{updatedLine}</p>
+          </div>
+          <p class="md:text-right">
+            {c.footer.credits} <a href="/IMAGE_CREDITS.txt" class="underline">IMAGE_CREDITS.txt</a>.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

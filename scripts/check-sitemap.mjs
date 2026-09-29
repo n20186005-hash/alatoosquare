@@ -1,0 +1,11 @@
+import fs from 'node:fs';
+const s = fs.readFileSync('dist/sitemap-0.xml', 'utf8');
+const urls = [...s.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+console.log('url count:', urls.length);
+console.log(urls.join('\n'));
+console.log('has xhtml:link alternates:', /xhtml:link/.test(s));
+const alts = [...s.matchAll(/<xhtml:link[^>]*href="([^"]+)"[^>]*\/>/g)].map((m) => m[1]).slice(0, 6);
+console.log('sample alts:', alts);
+const robots = fs.readFileSync('dist/robots.txt', 'utf8');
+console.log('--- robots.txt ---');
+console.log(robots);

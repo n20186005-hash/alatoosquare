@@ -1,12 +1,12 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import HomeSections from '../components/HomeSections.astro';
-import { content } from '../content';
-import { attractionSchema, faqSchema, websiteSchema } from '../lib/schema';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import HomeSections from '../../components/HomeSections.astro';
+import { content } from '../../content';
+import { attractionSchema, faqSchema, websiteSchema } from '../../lib/schema';
 
 export const prerender = true;
 
-const locale = 'ky' as const;
+const locale = 'ru' as const;
 const siteUrl = (Astro.site ? Astro.site.toString() : 'https://alatoosquare.com').replace(/\/$/, '');
 const c = content[locale].home;
 const schema = [attractionSchema(locale, siteUrl, '/'), faqSchema(c.faq.items), websiteSchema(locale, siteUrl)];
